@@ -34,6 +34,14 @@ pub enum CoreError {
     #[error("That template no longer exists.")]
     TemplateNotFound(TemplateId),
 
+    /// The referenced slide index does not exist in the song.
+    #[error("That slide no longer exists (slide {}).", .0 + 1)]
+    SlideNotFound(usize),
+
+    /// Next/Previous was pressed with nothing live.
+    #[error("Nothing is live. Click a slide to present it.")]
+    NothingLive,
+
     /// A style value was outside its allowed range.
     #[error("{field} must be between {min} and {max}.")]
     StyleOutOfRange {

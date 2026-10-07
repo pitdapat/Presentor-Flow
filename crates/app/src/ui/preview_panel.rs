@@ -1,14 +1,12 @@
 //! Selected-slide preview (teal) and live-output preview (red).
 
-use presenter_core::presentation::{LiveContent, LiveState};
+use presenter_core::presentation::{LiveContent, LiveState, OutputFrame};
 
-use crate::actions::Action;
 use crate::state::AppState;
 
-use super::theme;
+use super::{theme, View};
 
-/// Projector aspect ratio used for the preview boxes until a display is
-/// chosen (T0.3).
+/// Projector aspect ratio of the preview boxes.
 const ASPECT: f32 = 16.0 / 9.0;
 /// Vertical space taken by the two box headings and the gap between them.
 const HEADINGS_HEIGHT: f32 = 60.0;
@@ -46,7 +44,7 @@ impl LiveBadge {
     }
 }
 
-pub(super) fn show(ui: &mut egui::Ui, state: &AppState, _actions: &mut Vec<Action>) {
+pub(super) fn show(ui: &mut egui::Ui, state: &AppState, view: &mut View<'_>) {
     // Both boxes must fit the space we are given: size them from whichever
     // of width or height runs out first.
     let box_height = ((ui.available_height() - HEADINGS_HEIGHT) / 2.0).max(MIN_BOX_HEIGHT);
@@ -56,11 +54,26 @@ pub(super) fn show(ui: &mut egui::Ui, state: &AppState, _actions: &mut Vec<Actio
     };
 
     ui.strong("Preview");
-    let preview_text = match state.ui.selected_slide {
-        Some(_) => "Slide preview — drawn in T2.2",
-        None => "No slide selected",
-    };
-    framed_box(ui, box_size, theme::TEAL, preview_text);
+    let selected = state
+        .ui
+        .selected_song
+        .and_then(|id| state.library.song(id))
+        .zip(state.ui.selected_slide)
+        .and_then(|(song, index)| {
+            let slide = song.slides().into_iter().nth(index)?;
+            Some(OutputFrame::Slide {
+                slide,
+                style: song.style,
+            })
+        });
+    slide_box(
+        ui,
+        view,
+        box_size,
+        theme::TEAL,
+        selected.as_ref(),
+        "No slide selected",
+    );
 
     ui.add_space(6.0);
     ui.horizontal(|ui| {
@@ -68,32 +81,60 @@ pub(super) fn show(ui: &mut egui::Ui, state: &AppState, _actions: &mut Vec<Actio
         if let Some(badge) = LiveBadge::for_state(&state.live) {
             badge_label(ui, badge);
         }
+        if let LiveContent::Slide(snap) = state.live.content() {
+            ui.weak(format!(
+                "{} — slide {} of {}",
+                snap.song_title,
+                snap.slide_index + 1,
+                snap.slide_count
+            ));
+        }
     });
-    let live_text = match state.live.content() {
-        LiveContent::Empty => "Nothing live",
-        LiveContent::Slide(_) => "Live slide — drawn in T2.2",
-        LiveContent::LyricsCleared { .. } => "Lyrics cleared",
+    let live = match state.live.content() {
+        LiveContent::Empty if !state.live.is_blackout() => None,
+        _ => Some(state.live.frame()),
     };
-    framed_box(ui, box_size, theme::LIVE_RED, live_text);
+    slide_box(
+        ui,
+        view,
+        box_size,
+        theme::LIVE_RED,
+        live.as_ref(),
+        "Nothing live",
+    );
 }
 
-/// A 16:9 box with a colored frame and centered placeholder text.
-fn framed_box(ui: &mut egui::Ui, size: egui::Vec2, stroke: egui::Color32, text: &str) {
+/// A 16:9 box with a colored frame showing `frame`, or `empty_text`.
+fn slide_box(
+    ui: &mut egui::Ui,
+    view: &mut View<'_>,
+    size: egui::Vec2,
+    stroke: egui::Color32,
+    frame: Option<&OutputFrame>,
+    empty_text: &str,
+) {
     let (rect, _) = ui.allocate_exact_size(size, egui::Sense::hover());
     let painter = ui.painter_at(rect);
-    painter.rect_filled(rect, 2.0, theme::INSET);
+    match frame {
+        Some(frame) => {
+            view.render.paint(&painter, rect, frame);
+        }
+        None => {
+            painter.rect_filled(rect, 2.0, theme::INSET);
+            painter.text(
+                rect.center(),
+                egui::Align2::CENTER_CENTER,
+                empty_text,
+                egui::FontId::proportional(14.0),
+                theme::TEXT_WEAK,
+            );
+        }
+    }
     painter.rect_stroke(
         rect,
         2.0,
         egui::Stroke::new(theme::FRAME_STROKE, stroke),
         egui::StrokeKind::Inside,
-    );
-    painter.text(
-        rect.center(),
-        egui::Align2::CENTER_CENTER,
-        text,
-        egui::FontId::proportional(14.0),
-        theme::TEXT_WEAK,
     );
 }
 

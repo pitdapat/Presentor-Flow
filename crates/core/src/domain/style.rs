@@ -106,13 +106,55 @@ impl Default for TextStyle {
 impl TextStyle {
     /// Checks every numeric field against its allowed range.
     pub fn validate(&self) -> Result<(), crate::CoreError> {
-        todo!("T4.1: validate style ranges")
+        check("Font size", self.size, &SIZE_RANGE)?;
+        check("Line height", self.line_height, &LINE_HEIGHT_RANGE)?;
+        check("Letter spacing", self.letter_spacing, &LETTER_SPACING_RANGE)
+    }
+}
+
+/// Fails with [`crate::CoreError::StyleOutOfRange`] when `value` is outside
+/// `range` (NaN is always outside).
+fn check(
+    field: &'static str,
+    value: f32,
+    range: &RangeInclusive<f32>,
+) -> Result<(), crate::CoreError> {
+    if range.contains(&value) {
+        Ok(())
+    } else {
+        Err(crate::CoreError::StyleOutOfRange {
+            field,
+            min: *range.start(),
+            max: *range.end(),
+        })
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn validate_rejects_out_of_range_values() {
+        assert!(TextStyle::default().validate().is_ok());
+        let bad = [
+            TextStyle {
+                size: 7.9,
+                ..TextStyle::default()
+            },
+            TextStyle {
+                line_height: 3.1,
+                ..TextStyle::default()
+            },
+            TextStyle {
+                letter_spacing: f32::NAN,
+                ..TextStyle::default()
+            },
+        ];
+        for style in bad {
+            assert!(style.validate().is_err(), "{style:?}");
+        }
+    }
 
     #[test]
     fn default_style_is_within_ranges() {
