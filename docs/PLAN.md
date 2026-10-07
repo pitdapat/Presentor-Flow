@@ -86,7 +86,8 @@ Every milestone therefore ends with a **human gate** (§2.5). Agent-only checks 
 - **Gate reviews.** At the end of a milestone the agent posts the gate checklist from §7 for you to run. You reply "pass" or list the failures. Failures become bug tasks in the next session.
 - **Change control.** New ideas go into the backlog (§9.3). They only enter the current milestone if you swap something else out.
 - **Escalations** use one line of background, the exact action needed and the cost of waiting. The agent parks the blocked item and keeps working on others.
-- Git rules: work on feature branches and never push directly to `main`. You merge, or you authorize the agent to merge, one milestone at a time.
+- Git rules: work on feature branches and never push directly to `main`. You merge, or you authorize the agent to merge, one milestone at a time. (One-time exception: the bootstrap commits, see ADR-0005.)
+- **Progress tracking:** `docs/STATUS.md` is the checklist for every task and gate. The PR that completes a task also ticks it there.
 
 ### 2.6 Project documents (inside the repo)
 
@@ -447,7 +448,7 @@ Interaction rules:
 | R2 | Letter spacing or line height in egui doesn't match the measurer | Medium / Medium | Single layout path (§3.6); parity test (T0.5) | Agent |
 | R3 | Noto Sans SC adds roughly 10–17 MB to the binary or slows startup | High / Low | Load the font from `assets/` next to the exe instead of embedding it; measure startup | Agent |
 | R4 | DPI scaling differs between the laptop screen and the projector | Medium / Medium | Size the output from the monitor's physical pixels; gate test at 100%, 125% and 150% | You |
-| R5 | No Rust toolchain on this machine | **Confirmed** | T0.0: install rustup and MSVC Build Tools | You approve, then the agent installs |
+| R5 | No Rust toolchain on this machine | **Closed 2026-10-07** | T0.0 done: Rust 1.99.0 on `D:\dev\rust` | — |
 | R6 | The agent loses context between sessions | Medium / Medium | Keep `STATUS.md`, `DECISIONS.md` and the work ledger current; one task per session | Agent |
 | R7 | Scope creep | High / Medium | Change control (§2.5); backlog (§9.3) | You |
 | R8 | egui breaking changes | Medium / Low | Pin versions exactly; upgrade only as a planned task | Agent |

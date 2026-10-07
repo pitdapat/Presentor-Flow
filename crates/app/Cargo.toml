@@ -1,0 +1,25 @@
+[package]
+name = "presenter-flow"
+description = "Presenter Flow operator app (egui)."
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "presenter-flow"
+path = "src/main.rs"
+
+[dependencies]
+presenter-core.workspace = true
+eframe.workspace = true
+egui.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+windows.workspace = true
+
+[lints]
+workspace = true
