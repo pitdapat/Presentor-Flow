@@ -21,7 +21,12 @@ A free, offline Windows app for preparing and presenting church song lyrics, wri
 crates/core   presenter-core  — domain, library, live state, layout, storage (no UI/OS deps)
 crates/app    presenter-flow  — egui operator app, output window, Windows monitor code
 assets/fonts  bundled fonts (added in T0.5)
+scripts       helper scripts (run.bat, run-release.bat), see scripts/README.md
 ```
+
+## Run
+
+Double-click `scripts\run.bat` to build (if needed) and open the app, or `scripts\run-release.bat` for the smoother release build.
 
 ## Build
 
