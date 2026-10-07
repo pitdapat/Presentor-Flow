@@ -1,0 +1,15 @@
+# Rust build output
+/target/
+
+# Editor / OS noise
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+Desktop.ini
+
+# Local logs and scratch
+*.log
+
+# Local agent/runtime settings (machine-specific)
+.kiro/settings/
