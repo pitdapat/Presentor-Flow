@@ -11,9 +11,10 @@ pub struct PresenterApp {
 }
 
 impl PresenterApp {
-    /// Creates the app. Fonts, theme and storage loading are added in
-    /// T0.2, T0.5 and T1.3.
-    pub fn new(_cc: &eframe::CreationContext<'_>) -> Self {
+    /// Creates the app and installs the theme. Fonts and storage loading are
+    /// added in T0.5 and T1.3.
+    pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
+        ui::theme::install(&cc.egui_ctx);
         Self {
             state: AppState::default(),
         }

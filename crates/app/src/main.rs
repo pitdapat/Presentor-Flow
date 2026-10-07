@@ -24,7 +24,10 @@ fn main() -> eframe::Result {
         viewport: egui::ViewportBuilder::default()
             .with_title("Presenter Flow")
             .with_inner_size([1440.0, 900.0])
-            .with_min_inner_size([1024.0, 640.0]),
+            .with_min_inner_size([1024.0, 640.0])
+            // The operator console uses the whole screen; this also keeps
+            // the bottom bar visible on screens smaller than the default size.
+            .with_maximized(true),
         persist_window: true,
         ..Default::default()
     };
