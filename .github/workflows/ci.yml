@@ -1,9 +1,10 @@
 name: CI
 
+# Manual-only until the project nears release (ADR-0007). Day-to-day checks
+# run locally with scripts\check.bat. To run CI: Actions tab -> CI ->
+# "Run workflow", or `gh workflow run CI --ref <branch>`.
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read

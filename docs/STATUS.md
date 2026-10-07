@@ -20,8 +20,8 @@ Legend: `[x]` done · `[~]` in review / partially done · `[ ]` todo
 ## M0 — Foundation and risk prototype (3–4 S)
 
 - [x] **T0.0** Rust toolchain installed (rustup 1.99.0 on `D:\dev\rust`; MSVC 14.44 + Windows SDK reused from existing VS Build Tools)
-- [~] **T0.1** Workspace, both crates, toolchain file, lints, pinned dependencies, CI, `docs/` skeleton — done locally (fmt, clippy `-D warnings`, 10 tests pass, app window opens); waiting on first green CI run
-- [ ] **T0.2** Operator shell: all panels as placeholders (✔ skeleton), theme, `Action`/`apply` wiring — screenshot matches PLAN §4
+- [x] **T0.1** Workspace, both crates, toolchain file, lints, pinned dependencies, CI, `docs/` skeleton — CI green on `main` (run 37633412168)
+- [~] **T0.2** Operator shell: all panels as placeholders, theme, `Action`/`apply` wiring — in review; screenshot `docs/screenshots/t0.2-operator-shell.png`
 - [ ] **T0.3** `platform/windows.rs` monitor list + toolbar display selector
 - [ ] **T0.4** Output viewport fullscreen on chosen monitor with a hard-coded slide
 - [ ] **T0.5** Bundled fonts, `EguiMeasurer`, `layout_slide`, `paint_slide`, parity test
@@ -58,6 +58,7 @@ Legend: `[x]` done · `[~]` in review / partially done · `[ ]` todo
 
 ## M5 — Hardening and release (2–3 S)
 
+- [ ] **T5.0** Switch GitHub CI back on for PRs and `main` (ADR-0007); first green run
 - [ ] **T5.1** DPI review (100/125/150 %), min panel sizes, error-message pass
 - [ ] **T5.2** Independent fresh-context code review; fix findings; remove skeleton `expect(dead_code)`
 - [ ] **T5.3** Release build: icon, version info, portable zip
@@ -88,3 +89,4 @@ Legend: `[x]` done · `[~]` in review / partially done · `[ ]` todo
 | Date | Session | Done | Next |
 |---|---|---|---|
 | 2026-10-07 | S1 | T0.0; T0.1 skeleton (workspace, crates, CI, docs); initial push to `main` | Confirm CI green → T0.2 on branch `m0/t0.2-operator-shell` |
+| 2026-10-07 | S2 | T0.1 CI green; T0.2 operator shell (theme, PLAN §4 layout, split columns, live badge, blackout banner) → PR; `scripts\run.bat`; CI switched to manual-only, local `scripts\check.bat` (ADR-0007) | Merge T0.2 PR → T0.3 monitor list on `m0/t0.3-monitor-list` |

@@ -46,7 +46,7 @@ Video and image backgrounds, Bible, stage display, transitions, bilingual layout
 |---|---|---|
 | Product owner | You | Set priorities, approve scope changes, accept milestones |
 | Tester on real hardware | You | Projector, church laptop, real lyrics, look and feel — things the agent cannot do |
-| Project manager and implementer | Kiro (AI agent) | Break down tasks, write code and tests, run CI checks, track status, keep the docs current |
+| Project manager and implementer | Kiro (AI agent) | Break down tasks, write code and tests, run local checks, track status, keep the docs current |
 | Independent reviewer | A fresh-context Kiro sub-agent (`sage-review`) | Blind code review at every milestone gate |
 
 ### 2.2 What the agent can and cannot verify
@@ -72,7 +72,7 @@ Every milestone therefore ends with a **human gate** (§2.5). Agent-only checks 
 
 **Done** (before the agent reports a task complete):
 
-- `cargo fmt --check`, `cargo clippy --workspace --all-targets -- -D warnings` and `cargo test --workspace` all pass.
+- `scripts\check.bat` passes locally: `cargo fmt --check`, `cargo clippy --workspace --all-targets -- -D warnings` and `cargo test --workspace` (ADR-0007; GitHub CI is not used until M5).
 - New behavior has tests in `core` wherever the logic lives there.
 - There is no `unwrap()` or `expect()` on user data, files, fonts or displays.
 - Public items have doc comments.
@@ -112,7 +112,7 @@ presenter-flow/
 ├─ rust-toolchain.toml        # pinned stable toolchain, edition 2021
 ├─ assets/fonts/              # Noto Sans, Noto Sans SC (+ OFL.txt)
 ├─ docs/
-├─ .github/workflows/ci.yml   # windows-latest: fmt, clippy, test
+├─ .github/workflows/ci.yml   # windows-latest: fmt, clippy, test (manual-only until M5, ADR-0007)
 └─ crates/
    ├─ core/                   # package: presenter-core — NO egui, NO winit, NO windows
    │  └─ src/
@@ -436,7 +436,7 @@ Interaction rules:
 - Fallible operations return `Result`. `CoreError` and `AppError` each carry a user-readable `Display`.
 - Domain rules live in `core` only. UI code formats and dispatches, and nothing more.
 - Tests sit next to the code (`#[cfg(test)]`) for units. `crates/core/tests/` holds behavior tests: library, live state and storage round trips.
-- CI runs on `windows-latest` on every PR: fmt, clippy, test, and a release build.
+- CI (`windows-latest`: fmt, clippy, test, release build) is manual-only during development and runs automatically on PRs again from M5 (ADR-0007). Until then `scripts\check.bat` runs the same checks locally.
 
 ---
 

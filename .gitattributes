@@ -3,6 +3,9 @@
 *.rs text eol=lf
 *.md text eol=lf
 *.toml text eol=lf
+# cmd.exe needs CRLF line endings in batch files
+*.bat text eol=crlf
+*.cmd text eol=crlf
 *.ttf binary
 *.otf binary
 *.png binary
