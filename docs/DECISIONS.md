@@ -41,3 +41,11 @@ Short ADRs: context, decision, consequences. Newest last. A decision is changed 
 - **Date:** 2026-10-07 · **Status:** Accepted (temporary)
 - **Decision:** Unimplemented functions panic with the task ID that implements them, so `grep 'todo!("T'` lists outstanding work. The app crate carries `#![expect(dead_code)]` during the skeleton phase; `expect` warns once nothing is dead, forcing its removal.
 - **Consequences:** No `todo!` may remain on a code path reachable from the UI at a milestone gate. All are gone by T5.2.
+
+
+## ADR-0007 - Local checks instead of GitHub CI until release prep
+
+- **Date:** 2026-10-07 · **Status:** Accepted
+- **Context:** The product owner wants to conserve GitHub Actions usage during development.
+- **Decision:** `.github/workflows/ci.yml` runs only when started by hand (`workflow_dispatch`). The Definition of Done is met by running `scripts\check.bat` locally (fmt, clippy `-D warnings`, tests; `release` adds the release build), and the agent's report includes its output. Automatic CI on PRs is switched back on during M5 (release prep).
+- **Consequences:** Checks run on the developer machine only, so a "works on my machine" problem (e.g. an uncommitted file) can slip through. Mitigation: run `check.bat` from a clean working tree before reporting a task done, and run CI once by hand at each milestone gate if needed.

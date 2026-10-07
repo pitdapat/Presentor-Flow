@@ -58,6 +58,7 @@ Legend: `[x]` done · `[~]` in review / partially done · `[ ]` todo
 
 ## M5 — Hardening and release (2–3 S)
 
+- [ ] **T5.0** Switch GitHub CI back on for PRs and `main` (ADR-0007); first green run
 - [ ] **T5.1** DPI review (100/125/150 %), min panel sizes, error-message pass
 - [ ] **T5.2** Independent fresh-context code review; fix findings; remove skeleton `expect(dead_code)`
 - [ ] **T5.3** Release build: icon, version info, portable zip
@@ -88,4 +89,4 @@ Legend: `[x]` done · `[~]` in review / partially done · `[ ]` todo
 | Date | Session | Done | Next |
 |---|---|---|---|
 | 2026-10-07 | S1 | T0.0; T0.1 skeleton (workspace, crates, CI, docs); initial push to `main` | Confirm CI green → T0.2 on branch `m0/t0.2-operator-shell` |
-| 2026-10-07 | S2 | T0.1 CI green; T0.2 operator shell (theme, PLAN §4 layout, split columns, live badge, blackout banner) → PR | Merge T0.2 PR → T0.3 monitor list on `m0/t0.3-monitor-list` |
+| 2026-10-07 | S2 | T0.1 CI green; T0.2 operator shell (theme, PLAN §4 layout, split columns, live badge, blackout banner) → PR; `scripts\run.bat`; CI switched to manual-only, local `scripts\check.bat` (ADR-0007) | Merge T0.2 PR → T0.3 monitor list on `m0/t0.3-monitor-list` |
