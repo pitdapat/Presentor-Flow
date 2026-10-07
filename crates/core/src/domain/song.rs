@@ -7,6 +7,13 @@ use crate::ids::SongId;
 /// Seconds since the Unix epoch.
 pub type Timestamp = u64;
 
+/// The current time as a [`Timestamp`]. A clock before 1970 reads as 0.
+pub fn now() -> Timestamp {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |d| d.as_secs())
+}
+
 /// A song in the library. `lyrics_source` is the source of truth; slides are
 /// always derived from it.
 #[derive(Debug, Clone, PartialEq)]

@@ -1,45 +1,65 @@
 //! Bottom bar: Previous, Next, Clear Lyrics, Blackout; save and output status.
 
 use crate::actions::Action;
-use crate::state::AppState;
+use crate::state::{AppState, SaveStatus};
 
-use super::theme;
+use super::{theme, View};
 
-pub(super) fn show(ui: &mut egui::Ui, state: &AppState, actions: &mut Vec<Action>) {
+pub(super) fn show(ui: &mut egui::Ui, state: &AppState, view: &mut View<'_>) {
     ui.horizontal(|ui| {
-        // Navigation actions are wired now; `apply` reports them as not
-        // implemented until T2.1 builds the live-state rules.
-        if ui.button("◀ Previous").clicked() {
-            actions.push(Action::PreviousSlide);
+        if ui
+            .button("◀ Previous")
+            .on_hover_text("← ↑ PageUp")
+            .clicked()
+        {
+            view.push(Action::PreviousSlide);
         }
-        if ui.button("Next ▶").clicked() {
-            actions.push(Action::NextSlide);
+        if ui
+            .button("Next ▶")
+            .on_hover_text("→ ↓ Space PageDown")
+            .clicked()
+        {
+            view.push(Action::NextSlide);
         }
-        if ui.button("Clear Lyrics").clicked() {
-            actions.push(Action::ClearLyrics);
+        if ui.button("Clear Lyrics").on_hover_text("C").clicked() {
+            view.push(Action::ClearLyrics);
         }
 
         let blackout = state.live.is_blackout();
-        let label = if blackout { "Blackout: ON" } else { "Blackout" };
-        let mut button = egui::Button::new(label);
-        if blackout {
-            button = button.fill(theme::LIVE_RED);
-        }
-        if ui.add(button).clicked() {
-            actions.push(Action::ToggleBlackout);
+        let button = if blackout {
+            egui::Button::new(egui::RichText::new("Blackout: ON").color(theme::ON_ACCENT))
+                .fill(theme::LIVE_RED)
+        } else {
+            egui::Button::new("Blackout")
+        };
+        if ui.add(button).on_hover_text("B").clicked() {
+            view.push(Action::ToggleBlackout);
         }
 
         ui.separator();
         match &state.ui.status_message {
-            Some(msg) => ui.label(msg),
+            Some(msg) if msg.is_error => ui.colored_label(theme::LIVE_RED, &msg.text),
+            Some(msg) => ui.label(&msg.text),
             None => ui.weak("Ready"),
         };
 
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-            // Real values arrive with storage (T1.3) and the output window (T0.4).
-            ui.weak("Output: off");
+            match state.output_display() {
+                Some(d) if state.output_open => {
+                    ui.colored_label(theme::LIVE_RED, format!("Output: {}", d.friendly_name))
+                }
+                Some(_) => ui.weak("Output: closed"),
+                None => ui.weak("Output: no display chosen"),
+            };
             ui.separator();
-            ui.weak("Not saved yet");
+            match &state.ui.save_status {
+                SaveStatus::Idle => ui.weak("No changes"),
+                SaveStatus::Unsaved => ui.weak("Saving…"),
+                SaveStatus::Saved => ui.weak("All changes saved"),
+                SaveStatus::Failed(err) => ui
+                    .colored_label(theme::LIVE_RED, "⚠ Save failed")
+                    .on_hover_text(err),
+            };
         });
     });
 }

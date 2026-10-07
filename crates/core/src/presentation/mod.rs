@@ -2,4 +2,4 @@
 
 pub mod live;
 
-pub use live::{LiveContent, LiveSnapshot, LiveState, OutputFrame};
+pub use live::{LiveContent, LiveCursor, LiveSnapshot, LiveState, OutputFrame};

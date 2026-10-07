@@ -57,3 +57,20 @@ Short ADRs: context, decision, consequences. Newest last. A decision is changed 
 - **Context:** The product owner authorized the agent to merge PRs so work is not blocked between sessions.
 - **Decision:** The agent squash-merges each task PR (`gh pr merge --squash`) once `scripts\check.bat` passes locally (ADR-0007) and its report, including screenshots for UI changes, is posted on the PR and in chat. Feature branches are kept after merging, not deleted. The product owner reviews at milestone gates (G0–G5).
 - **Consequences:** No per-PR human approval. Mitigations: one task per PR keeps each merge small and revertible; gates catch anything missed; T5.2 is an independent review of everything merged.
+
+
+## ADR-0009 - Basic functionality delivered as one batch; output and layout choices
+
+- **Date:** 2026-10-07 · **Status:** Accepted
+- **Context:** The product owner asked for the basic app (rest of M0, songs, live presenting) in one go so it can be tested, accepting that some roadmap items are only partly done.
+- **Decisions:**
+  - One branch and PR (`m0/basic-functionality`) covers T0.3–T2.4 instead of one PR per task. Partly finished tasks are marked `[~]` in STATUS.md with what is still missing.
+  - **Output window:** a second monitor gets a borderless fullscreen viewport via `ViewportBuilder::with_monitor(os_index)`, where `os_index` is the monitor's position in `EnumDisplayMonitors` order (winit enumerates with the same call). If the chosen display is the operator's own screen, a normal 960×540 test window opens instead, so the app can be tried with one screen and fullscreen output never covers the operator window.
+  - Displays are labeled "Display 1, 2, …" by sorted position (primary first), because Windows device numbers such as `DISPLAY129` mean nothing to people. They are still matched by device name + rectangle.
+  - **Fonts** are read from `assets/fonts` next to the exe (or the repo folder under `cargo run`), not embedded (R3). Missing fonts fall back to egui's defaults with a red status message.
+  - **Measuring** happens at a 32 pt reference size, scaled linearly, so egui never rasterizes 400 pt glyphs just to measure. Measurer and painter share one `text_job` function (R2).
+  - **Layout cache** is keyed by slide text + style instead of `(song id, updated_at, index)`, so it also serves live snapshots and can never return a stale layout when two edits land in the same second.
+  - **Clear Lyrics** remembers the cleared slide (`LyricsCleared { last }`) so Next continues from it, as PLAN §3.5 requires.
+  - **Song editor** keeps the draft in `UiState` and updates it through `EditDraft` actions; Esc or clicking outside closes it only when nothing would be lost.
+  - **First launch** adds three sample songs (Amazing Grace — public domain; a Chinese/English test text written for the app; a layout test).
+- **Consequences:** Larger review unit than ADR-0008 intends; the T5.2 independent review covers it. G0–G2 hardware checks remain open.

@@ -14,6 +14,7 @@ mod error;
 mod output;
 mod platform;
 mod render;
+mod samples;
 mod state;
 mod ui;
 

@@ -14,6 +14,8 @@ use crate::CoreError;
 /// What happened while loading, so the UI can tell the user.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LoadNotice {
+    /// No library file existed yet (first launch).
+    FirstRun,
     /// Loaded normally.
     Clean,
     /// The main file was damaged and set aside; the backup was used.
