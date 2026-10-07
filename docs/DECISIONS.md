@@ -49,3 +49,11 @@ Short ADRs: context, decision, consequences. Newest last. A decision is changed 
 - **Context:** The product owner wants to conserve GitHub Actions usage during development.
 - **Decision:** `.github/workflows/ci.yml` runs only when started by hand (`workflow_dispatch`). The Definition of Done is met by running `scripts\check.bat` locally (fmt, clippy `-D warnings`, tests; `release` adds the release build), and the agent's report includes its output. Automatic CI on PRs is switched back on during M5 (release prep).
 - **Consequences:** Checks run on the developer machine only, so a "works on my machine" problem (e.g. an uncommitted file) can slip through. Mitigation: run `check.bat` from a clean working tree before reporting a task done, and run CI once by hand at each milestone gate if needed.
+
+
+## ADR-0008 - Agent merges its own PRs after local checks
+
+- **Date:** 2026-10-07 · **Status:** Accepted
+- **Context:** The product owner authorized the agent to merge PRs so work is not blocked between sessions.
+- **Decision:** The agent squash-merges each task PR (`gh pr merge --squash`) once `scripts\check.bat` passes locally (ADR-0007) and its report, including screenshots for UI changes, is posted on the PR and in chat. Feature branches are kept after merging, not deleted. The product owner reviews at milestone gates (G0–G5).
+- **Consequences:** No per-PR human approval. Mitigations: one task per PR keeps each merge small and revertible; gates catch anything missed; T5.2 is an independent review of everything merged.

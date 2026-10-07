@@ -86,7 +86,7 @@ Every milestone therefore ends with a **human gate** (§2.5). Agent-only checks 
 - **Gate reviews.** At the end of a milestone the agent posts the gate checklist from §7 for you to run. You reply "pass" or list the failures. Failures become bug tasks in the next session.
 - **Change control.** New ideas go into the backlog (§9.3). They only enter the current milestone if you swap something else out.
 - **Escalations** use one line of background, the exact action needed and the cost of waiting. The agent parks the blocked item and keeps working on others.
-- Git rules: work on feature branches and never push directly to `main`. You merge, or you authorize the agent to merge, one milestone at a time. (One-time exception: the bootstrap commits, see ADR-0005.)
+- Git rules: work on feature branches and never push directly to `main`. The agent squash-merges its own PR once `scripts\check.bat` passes locally and the report (with screenshots for UI changes) is posted (ADR-0008); you review at the milestone gates and can revert any merge. (One-time exception: the bootstrap commits, see ADR-0005.)
 - **Progress tracking:** `docs/STATUS.md` is the checklist for every task and gate. The PR that completes a task also ticks it there.
 
 ### 2.6 Project documents (inside the repo)
