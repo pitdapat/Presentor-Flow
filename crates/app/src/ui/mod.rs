@@ -8,6 +8,8 @@ mod preview_panel;
 mod slide_grid;
 mod status_bar;
 mod style_panel;
+#[cfg(test)]
+mod tests;
 pub mod theme;
 mod toolbar;
 

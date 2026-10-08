@@ -11,6 +11,10 @@ setlocal
 
 cd /d "%~dp0.."
 
+rem Keep Rust's caches on D: even if this window predates the install
+rem (otherwise cargo falls back to C:\Users\<you>\.cargo).
+if not defined CARGO_HOME set "CARGO_HOME=D:\dev\rust\cargo"
+if not defined RUSTUP_HOME set "RUSTUP_HOME=D:\dev\rust\rustup"
 where cargo >nul 2>nul
 if errorlevel 1 set "PATH=D:\dev\rust\cargo\bin;%PATH%"
 where cargo >nul 2>nul

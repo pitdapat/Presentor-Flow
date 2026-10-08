@@ -32,7 +32,7 @@ Legend: `[x]` done · `[~]` in review / partially done · `[ ]` todo
 - [x] **T1.1** Domain types, IDs, `parse_lyrics` with table-driven tests (17 cases)
 - [x] **T1.2** `Library` song operations and validation
 - [x] **T1.3** Storage schema v1, `JsonRepository` (atomic save, `.bak`, corrupt files set aside, never deleted)
-- [~] **T1.4** Song editor dialog, library panel + search, thumbnails, autosave, sample songs on first run — built; dialog opens and validates; add/edit not yet clicked through end to end
+- [x] **T1.4** Song editor dialog, library panel + search, thumbnails, autosave, sample songs on first run — add, edit and the disabled-Save rule are driven through the real window by headless UI tests (`crates/app/src/ui/tests.rs`, egui_kittest)
 - [ ] **G1** (you) 3 real songs incl. Chinese survive restart; hand-corrupted file recovers from `.bak`
 
 ## M2 — Live operation (2–3 S) — first usable
@@ -91,3 +91,4 @@ Legend: `[x]` done · `[~]` in review / partially done · `[ ]` todo
 | 2026-10-07 | S1 | T0.0; T0.1 skeleton (workspace, crates, CI, docs); initial push to `main` | Confirm CI green → T0.2 on branch `m0/t0.2-operator-shell` |
 | 2026-10-07 | S2 | T0.1 CI green; T0.2 operator shell (theme, PLAN §4 layout, split columns, live badge, blackout banner) → PR; `scripts\run.bat`; CI switched to manual-only, local `scripts\check.bat` (ADR-0007); PR #1 merged; agent auto-merges after local checks (ADR-0008) | T0.3 monitor list on `m0/t0.3-monitor-list` |
 | 2026-10-07 | S3 | Basic functionality in one PR at your request (ADR-0009): T0.3, T0.5, T1.1–T1.3, T2.1, T2.2 done; T0.4, T1.4, T2.3, T2.4 built, partly verified; sample songs; 54 tests | You: run G0 + try adding a real song → then finish T1.4/T2.3/T2.4 checks, start M3 playlists |
+| 2026-10-08 | S4 | Fixes after S3 (PR #4): shortcut deadlock, renumbered display, panel padding / left-aligned library, quick `check.bat` (~3 s warm; `full` for app tests). T1.4 closed with headless UI tests of the editor; scripts pin `CARGO_HOME`/`RUSTUP_HOME` to D: | You: G0 (second screen) and G1 (real songs, restart, corrupt-file recovery) → then M3 playlists |
