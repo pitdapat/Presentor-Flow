@@ -25,30 +25,40 @@ pub(super) fn show(ui: &mut egui::Ui, state: &AppState, view: &mut View<'_>) {
     }
 
     let mut any = false;
-    for song in state.filtered_songs() {
-        any = true;
-        let selected = state.ui.selected_song == Some(song.id);
-        let is_live = matches!(
-            state.live.content(),
-            presenter_core::presentation::LiveContent::Slide(s) if s.song == song.id
-        );
-        let mut text = egui::RichText::new(&song.title);
-        if is_live {
-            text = text.color(theme::LIVE_RED);
+    // Justified + left-aligned: each row spans the panel, text starts at the
+    // left edge like every other heading and label in the column.
+    ui.with_layout(egui::Layout::top_down_justified(egui::Align::Min), |ui| {
+        for song in state.filtered_songs() {
+            any = true;
+            song_row(ui, state, song, view);
         }
-        let response = ui
-            .add_sized(
-                [ui.available_width(), 24.0],
-                egui::Button::selectable(selected, text),
-            )
-            .on_hover_text("Click to select · double-click to edit lyrics");
-        if response.double_clicked() {
-            view.push(Action::OpenEditor(Some(song.id)));
-        } else if response.clicked() {
-            view.push(Action::SelectSong(song.id));
-        }
-    }
+    });
     if !any {
         ui.weak("No song title matches the search.");
+    }
+}
+
+fn song_row(
+    ui: &mut egui::Ui,
+    state: &AppState,
+    song: &presenter_core::domain::Song,
+    view: &mut View<'_>,
+) {
+    let selected = state.ui.selected_song == Some(song.id);
+    let is_live = matches!(
+        state.live.content(),
+        presenter_core::presentation::LiveContent::Slide(s) if s.song == song.id
+    );
+    let mut text = egui::RichText::new(&song.title);
+    if is_live {
+        text = text.color(theme::LIVE_RED);
+    }
+    let response = ui
+        .add(egui::Button::selectable(selected, text).min_size(egui::vec2(0.0, 28.0)))
+        .on_hover_text("Click to select · double-click to edit lyrics");
+    if response.double_clicked() {
+        view.push(Action::OpenEditor(Some(song.id)));
+    } else if response.clicked() {
+        view.push(Action::SelectSong(song.id));
     }
 }

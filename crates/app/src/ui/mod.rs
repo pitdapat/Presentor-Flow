@@ -43,16 +43,21 @@ type PanelFn = fn(&mut egui::Ui, &AppState, &mut View<'_>);
 
 /// Draws the whole operator window for one frame.
 pub fn draw(root: &mut egui::Ui, state: &AppState, view: &mut View<'_>) {
-    egui::Panel::top("toolbar").show(root, |ui| toolbar::show(ui, state, view));
+    egui::Panel::top("toolbar")
+        .frame(theme::panel_frame(theme::BAR_MARGIN))
+        .show(root, |ui| toolbar::show(ui, state, view));
     if state.live.is_blackout() {
         blackout_banner(root);
     }
-    egui::Panel::bottom("status_bar").show(root, |ui| status_bar::show(ui, state, view));
+    egui::Panel::bottom("status_bar")
+        .frame(theme::panel_frame(theme::BAR_MARGIN))
+        .show(root, |ui| status_bar::show(ui, state, view));
 
     egui::Panel::left("left")
         .resizable(true)
         .min_size(LEFT_MIN_WIDTH)
-        .default_size(280.0)
+        .default_size(300.0)
+        .frame(theme::panel_frame(theme::PANEL_MARGIN))
         .show(root, |ui| {
             let halves = (
                 library_panel::show as PanelFn,
@@ -64,20 +69,24 @@ pub fn draw(root: &mut egui::Ui, state: &AppState, view: &mut View<'_>) {
     egui::Panel::right("right")
         .resizable(true)
         .min_size(RIGHT_MIN_WIDTH)
-        .default_size(400.0)
+        .default_size(420.0)
+        .frame(theme::panel_frame(theme::PANEL_MARGIN))
         .show(root, |ui| {
             let halves = (preview_panel::show as PanelFn, style_panel::show as PanelFn);
             split_column(ui, "right_split", halves, state, view);
         });
 
-    egui::CentralPanel::default().show(root, |ui| slide_grid::show(ui, state, view));
+    egui::CentralPanel::default()
+        .frame(theme::central_frame())
+        .show(root, |ui| slide_grid::show(ui, state, view));
 
     if let Some(editor) = &state.ui.editor {
         dialogs::song_editor::show(root.ctx(), state, editor, view);
     }
 }
 
-/// Splits a column into a resizable upper half and a lower half.
+/// Splits a column into a resizable upper half and a lower half. Both halves
+/// share the column's padding, so their content starts at the same x.
 fn split_column(
     ui: &mut egui::Ui,
     id: &str,
@@ -90,12 +99,18 @@ fn split_column(
         .resizable(true)
         .min_size(HALF_MIN_HEIGHT)
         .default_size(half)
+        // No side padding of its own: the column's margin already applies.
+        .frame(egui::Frame::new().inner_margin(egui::Margin {
+            bottom: theme::SECTION_GAP as i8,
+            ..egui::Margin::ZERO
+        }))
         .show(ui, |ui| {
             egui::ScrollArea::vertical()
                 .id_salt((id, "upper"))
                 .auto_shrink(false)
                 .show(ui, |ui| upper(ui, state, view));
         });
+    ui.add_space(theme::SECTION_GAP);
     egui::ScrollArea::vertical()
         .id_salt((id, "lower"))
         .auto_shrink(false)
@@ -108,7 +123,7 @@ fn blackout_banner(root: &mut egui::Ui) {
         .frame(
             egui::Frame::new()
                 .fill(theme::LIVE_RED)
-                .inner_margin(egui::Margin::symmetric(12, 8)),
+                .inner_margin(theme::BAR_MARGIN),
         )
         .show(root, |ui| {
             ui.vertical_centered(|ui| {
