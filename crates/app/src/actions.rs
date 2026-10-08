@@ -337,6 +337,30 @@ mod tests {
     }
 
     #[test]
+    fn renumbered_display_still_matches_by_position() -> TestResult {
+        let mut state = AppState::default();
+        let mut display = DisplayInfo {
+            device_name: r"\\.\DISPLAY129".into(),
+            friendly_name: "Display 1".into(),
+            rect: [0, 0, 2560, 1440],
+            is_primary: true,
+            scale_factor: 1.5,
+            os_index: 0,
+        };
+        apply(&mut state, Action::ChooseDisplay(display.to_ref()))?;
+        // Windows renamed the same monitor.
+        display.device_name = r"\\.\DISPLAY145".into();
+        apply(&mut state, Action::DisplaysRefreshed(vec![display.clone()]))?;
+        assert!(state.output_display().is_some());
+
+        // A different position is never treated as the same display.
+        display.rect = [2560, 0, 4480, 1080];
+        apply(&mut state, Action::DisplaysRefreshed(vec![display]))?;
+        assert!(state.output_display().is_none());
+        Ok(())
+    }
+
+    #[test]
     fn deleting_the_selected_song_clears_selection_not_live() -> TestResult {
         let (mut state, id) = with_song()?;
         apply(&mut state, Action::GoLive { song: id, slide: 1 })?;

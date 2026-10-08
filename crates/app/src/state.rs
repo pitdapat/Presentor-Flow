@@ -111,9 +111,21 @@ impl UiState {
 
 impl AppState {
     /// The display output goes to, if it is attached right now.
+    ///
+    /// Matches device name + rectangle first. Windows can renumber a monitor
+    /// (`DISPLAY129` → `DISPLAY145`, e.g. after a remote-desktop session), so
+    /// a display with the same rectangle also matches if it is the only one.
+    /// Output never moves to a screen at a different position.
     pub fn output_display(&self) -> Option<&DisplayInfo> {
         let chosen = self.settings.output_display.as_ref()?;
-        self.displays.iter().find(|d| d.matches(chosen))
+        if let Some(exact) = self.displays.iter().find(|d| d.matches(chosen)) {
+            return Some(exact);
+        }
+        let mut same_rect = self.displays.iter().filter(|d| d.rect == chosen.rect);
+        match (same_rect.next(), same_rect.next()) {
+            (Some(only), None) => Some(only),
+            _ => None,
+        }
     }
 
     /// Songs whose title contains the search text (case-insensitive), in
