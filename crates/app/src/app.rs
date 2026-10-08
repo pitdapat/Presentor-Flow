@@ -147,12 +147,18 @@ fn shortcuts(ctx: &egui::Context, state: &AppState, actions: &mut Vec<Action>) {
     if state.ui.editor.is_some() || ctx.egui_wants_keyboard_input() {
         return;
     }
-    ctx.input(|i| shortcut_actions(i, ctx.memory(|m| m.focused().is_none()), actions));
+    // Read focus BEFORE taking the input lock: calling `ctx.memory` inside a
+    // `ctx.input` closure re-enters egui's context lock and can deadlock.
+    let nothing_focused = ctx.memory(|m| m.focused().is_none());
+    ctx.input(|i| shortcut_actions(i, nothing_focused, actions));
 }
 
 /// Maps pressed keys to presentation actions. Shared with the output window,
 /// which receives the keys when it has focus (e.g. a clicker after the
 /// operator clicked the projector screen).
+///
+/// Runs inside an `input` closure, so it must not call back into the
+/// `egui::Context` (that would re-enter its lock).
 ///
 /// `space_is_next` is false while a button has keyboard focus: Space then
 /// presses that button, and also advancing would do two things at once.
