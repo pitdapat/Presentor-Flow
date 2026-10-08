@@ -6,7 +6,9 @@ use crate::state::AppState;
 use super::{theme, View};
 
 pub(super) fn show(ui: &mut egui::Ui, state: &AppState, view: &mut View<'_>) {
-    ui.horizontal(|ui| {
+    // Left-to-right with vertical centering, so the title lines up with the
+    // buttons beside it.
+    ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
         ui.strong("Presenter Flow");
         ui.separator();
         if ui.button("➕ Add Song").clicked() {

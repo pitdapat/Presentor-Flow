@@ -1,8 +1,12 @@
 @echo off
-rem Local quality gate: the same checks CI runs (PLAN 2.4, ADR-0007).
-rem Run before every commit that completes a task.
-rem   check.bat          fmt, clippy, tests
-rem   check.bat release  also builds the release exe
+rem Local quality gate (PLAN 2.4, ADR-0007).
+rem   check.bat          QUICK (default): format, lint, core tests.
+rem                      Lint is a check-only build (no code generated), so it
+rem                      catches every compile error fast. Core tests need no UI
+rem                      libraries, so they build in seconds.
+rem   check.bat full     adds the app tests (builds egui/wgpu: slow).
+rem                      Run before merging a PR that touches crates\app.
+rem   check.bat release  full + the release exe. Run before a release.
 setlocal
 
 cd /d "%~dp0.."
@@ -16,21 +20,29 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo [1/4] Format
+set "MODE=%~1"
+if "%MODE%"=="" set "MODE=quick"
+
+echo [format]
 cargo fmt --all --check || goto :failed
-echo [2/4] Clippy
+echo [lint]
 cargo clippy --workspace --all-targets --locked -- -D warnings || goto :failed
-echo [3/4] Tests
-cargo test --workspace --locked || goto :failed
-if /i "%~1"=="release" (
-    echo [4/4] Release build
-    cargo build --workspace --release --locked || goto :failed
+
+if /i "%MODE%"=="quick" (
+    echo [tests: core]
+    cargo test -p presenter-core --locked || goto :failed
 ) else (
-    echo [4/4] Release build skipped ^(pass "release" to include it^)
+    echo [tests: all]
+    cargo test --workspace --locked || goto :failed
+)
+
+if /i "%MODE%"=="release" (
+    echo [release build]
+    cargo build --workspace --release --locked || goto :failed
 )
 
 echo.
-echo All checks passed.
+echo All %MODE% checks passed.
 endlocal
 exit /b 0
 

@@ -30,6 +30,25 @@ pub const ON_ACCENT: Color32 = Color32::WHITE;
 /// Width of the preview / live frame strokes.
 pub const FRAME_STROKE: f32 = 2.0;
 
+/// Padding inside the side and central panels, so content never touches a
+/// panel or window edge. Every panel uses the same value so content lines up.
+pub const PANEL_MARGIN: egui::Margin = egui::Margin::symmetric(16, 12);
+/// Padding inside the top toolbar and bottom status bar.
+pub const BAR_MARGIN: egui::Margin = egui::Margin::symmetric(16, 8);
+/// Vertical gap between the two halves of a split column.
+pub const SECTION_GAP: f32 = 12.0;
+
+/// Frame for side panels and bars: panel background plus `margin`.
+pub fn panel_frame(margin: egui::Margin) -> egui::Frame {
+    egui::Frame::new().fill(PANEL).inner_margin(margin)
+}
+
+/// Frame for the central slide area: slightly darker so the panels around
+/// it read as separate columns.
+pub fn central_frame() -> egui::Frame {
+    egui::Frame::new().fill(CHARCOAL).inner_margin(PANEL_MARGIN)
+}
+
 /// Installs the theme on the context. Called once at startup.
 pub fn install(ctx: &egui::Context) {
     ctx.set_theme(Theme::Dark);

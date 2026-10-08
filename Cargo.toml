@@ -38,6 +38,11 @@ all = { level = "deny", priority = -1 }
 unwrap_used = "deny"
 expect_used = "deny"
 
+# Faster debug builds: no debug info for third-party crates (egui, wgpu, ...).
+# Our own crates keep full debug info, so backtraces still point at our code.
+[profile.dev.package."*"]
+debug = false
+
 [profile.release]
 lto = "thin"
 codegen-units = 1
