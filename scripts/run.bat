@@ -7,6 +7,10 @@ setlocal
 rem Always work from the repo root, wherever this file is started from.
 cd /d "%~dp0.."
 
+rem Keep Rust's caches on D: even if this window predates the install
+rem (otherwise cargo falls back to C:\Users\<you>\.cargo).
+if not defined CARGO_HOME set "CARGO_HOME=D:\dev\rust\cargo"
+if not defined RUSTUP_HOME set "RUSTUP_HOME=D:\dev\rust\rustup"
 rem Rust is installed on D: (PLAN T0.0). Add it to PATH if this window
 rem was opened before the install.
 where cargo >nul 2>nul
